@@ -4,7 +4,7 @@
 %endif
 
 Name:		rpm-openmandriva-setup
-Version:	0.1.99
+Version:	0.1.99a
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
@@ -38,9 +38,11 @@ find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../build.filelist
 %install
 mkdir -p %{buildroot}%{_rpmconfigdir}
 cp -a user/* build/* %{buildroot}%{_rpmconfigdir}
+install -D -m 644 macros.openmandriva %{buildroot}%{_rpmconfigdir}/openmandriva/macros
 
 %files -f user.filelist
 %dir %{_rpmconfigdir}/platform
 %dir %{_rpmconfigdir}/platform/*
+%{_rpmconfigdir}/openmandriva/macros
 
 %files build -f build.filelist

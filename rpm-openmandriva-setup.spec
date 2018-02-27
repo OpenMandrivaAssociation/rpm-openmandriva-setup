@@ -1,11 +1,16 @@
+# For transitioning from rpm5
+%if "%_rpmconfigdir" == "%%_rpmconfigdir"
+%define _rpmconfigdir /usr/lib/rpm
+%endif
+
 Name:		rpm-openmandriva-setup
-Version:	0.1.2
+Version:	0.1.99
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
 URL:		https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup
-Source0:	https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup/archive/%{name}-%{version}.tar.gz
+Source0:	https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup/archive/%{version}.tar.gz
 Requires:	rpm
 BuildArch:	noarch
 
@@ -26,16 +31,16 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %build
 cd user
-find . -type f -o -type l |sed -e 's,^\.,%%{_usrlibrpm},' >../user.filelist
+find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../user.filelist
 cd ../build
-find . -type f -o -type l |sed -e 's,^\.,%%{_usrlibrpm},' >../build.filelist
+find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../build.filelist
 
 %install
-mkdir -p %{buildroot}%{_usrlibrpm}
-cp -a user/* build/* %{buildroot}%{_usrlibrpm}
+mkdir -p %{buildroot}%{_rpmconfigdir}
+cp -a user/* build/* %{buildroot}%{_rpmconfigdir}
 
 %files -f user.filelist
-%dir %{_usrlibrpm}/platform
-%dir %{_usrlibrpm}/platform/*
+%dir %{_rpmconfigdir}/platform
+%dir %{_rpmconfigdir}/platform/*
 
 %files build -f build.filelist

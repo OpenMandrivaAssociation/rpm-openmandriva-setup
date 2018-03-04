@@ -19,7 +19,8 @@ Macros and scripts for OpenMandriva specific rpm behavior.
 Summary:	Macros and scripts for OpenMandriva specific rpmbuild behavior
 Group:		System/Configuration/Packaging
 Requires:	rpm-build >= 2:4.14.0-0
-Requires:	%{name} = %{EVRD}
+# (tpg) do not use %EVRD here, as it does not exists yet
+Requires:	%{name} = %{version}-%{release}
 
 %description build
 Macros and scripts for OpenMandriva specific rpmbuild behavior.

@@ -2,7 +2,7 @@
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
 
 Name:		rpm-openmandriva-setup
-Version:	0.2.8
+Version:	0.2.9
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
@@ -19,7 +19,7 @@ Macros and scripts for OpenMandriva specific rpm behavior.
 Summary:	Macros and scripts for OpenMandriva specific rpmbuild behavior
 Group:		System/Configuration/Packaging
 Requires:	rpm-build >= 2:4.14.0-0
-# (tpg) do not use %EVRD here, as it does not exists yet
+# (tpg) do not use %%EVRD here, as it does not exist yet
 Requires:	%{name} = %{version}-%{release}
 
 %description build

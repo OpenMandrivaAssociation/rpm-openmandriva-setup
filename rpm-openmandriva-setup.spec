@@ -21,6 +21,12 @@ Group:		System/Configuration/Packaging
 Requires:	rpm-build >= 2:4.14.0-0
 # (tpg) do not use %%EVRD here, as it does not exist yet
 Requires:	%{name} = %{version}-%{release}
+# Required for package builds to work
+#Requires:	dwz
+#Requires:	rpmlint
+#Requires:	rpmlint-openmandriva-policy
+Requires:	spec-helper >= 0.31.12
+Requires:	binutils
 
 %description build
 Macros and scripts for OpenMandriva specific rpmbuild behavior.

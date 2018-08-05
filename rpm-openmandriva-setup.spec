@@ -2,14 +2,14 @@
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
 
 Name:		rpm-openmandriva-setup
-Version:	0.3.4
+Version:	0.3.5
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
 URL:		https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup
 Source0:	https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup/archive/%{version}/%{name}-%{version}.tar.gz
-Requires:	rpm >= 2:4.14.0-0
+Requires:	rpm >= 2:4.14.2-0
 BuildArch:	noarch
 
 %description

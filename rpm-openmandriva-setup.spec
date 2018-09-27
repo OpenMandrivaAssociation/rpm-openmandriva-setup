@@ -3,7 +3,7 @@
 
 Name:		rpm-openmandriva-setup
 Version:	0.3.5.3
-Release:	1
+Release:	2
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT

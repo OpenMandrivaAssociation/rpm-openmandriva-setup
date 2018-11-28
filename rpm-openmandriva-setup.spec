@@ -3,7 +3,7 @@
 
 Name:		rpm-openmandriva-setup
 Version:	0.3.5.3
-Release:	3
+Release:	4
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
@@ -12,6 +12,11 @@ Source0:	https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup/archive/
 Requires:	rpm >= 2:4.14.2-0
 Recommends:	systemd-macros
 BuildArch:	noarch
+# Forge handling macros
+# (From: https://src.fedoraproject.org/rpms/redhat-rpm-config/tree):
+Source8:	forge.lua
+Source9:	macros.forge
+Source10:	common.lua
 
 %description
 Macros and scripts for OpenMandriva specific rpm behavior.
@@ -46,8 +51,17 @@ find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../build.filelist
 mkdir -p %{buildroot}%{_rpmconfigdir}
 cp -a user/* build/* %{buildroot}%{_rpmconfigdir}
 
+install -D %{S:9} -m 0644 %{buildroot}%{_rpmconfigdir}/macros.d/
+mkdir -p %{buildroot}%{_rpmluadir}/fedora/srpm
+install -D %{S:10} %{buildroot}%{_rpmluadir}/fedora
+install -D %{S:8} %{buildroot}%{_rpmluadir}/fedora/srpm
+
+
 %files -f user.filelist
 # We should own this directory
 %dir %{_rpmconfigdir}/openmandriva
 
 %files build -f build.filelist
+%{_rpmluadir}/fedora/common.lua
+%{_rpmluadir}/fedora/srpm/forge.lua
+%{_rpmconfigdir}/macros.d/macros.forge

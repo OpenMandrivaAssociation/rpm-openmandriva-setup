@@ -1,0 +1,97 @@
+# Map forge information to rpm metadata. This macro will compute default spec
+# variable values.
+#
+# The following spec variables SHOULD be set before calling the macro:
+#
+#   forgeurl  the project url on the forge, strongly recommended;
+#   Version   if applicable, set it with Version: <version>
+#   tag       if applicable
+#   commit    if applicable
+#   date      if applicable (to override the mtime of the Source archive)
+#
+#  Use -z for multiple calls to the macro
+#
+# The macro will attempt to compute and set the following variables if they are
+# not already set by the packager:
+#
+#   forgesource    an URL that can be used as SourceX: value
+#   forgesetupargs the correct arguments to pass to %setup for this source
+#                  used by %forgesetup and %forgeautosetup
+#   archivename    the source archive filename, without extentions
+#   archiveext     the source archive filename extensions, without leading dot
+#   archiveurl     the url that can be used to download the source archive,
+#                  without renaming
+#   topdir         the source archive top directory (can be empty)
+#   extractdir     the source directory created inside %{_builddir} after using
+#                  %%forgesetup, %forgeautosetup or %{forgesetupargs}
+#   repo           the repository name
+#   owner          the repository owner (if used by another computed variable)
+#   shortcommit    the commit hash clamping used by the forge, if any
+#   scm            the scm type, when packaging code snapshots: commits or tags
+#   distprefix     the prefix that needs adding to dist to trace non-release packaging
+#
+# Most of the computed variables are both overridable and optional.
+#
+# Optional parameters:
+#   -a          process all sources in one go, instead of using separate -z calls
+#   -z <number> suffix all the read and written variable names with <number>
+#               for example read     forgeurl<number>, version<number>…
+#                       and generate forgesetupargs<number>, archiveurl<number>…
+#               The macro assumes that null or nil suffix is used for the primary
+#               package source.
+#   -s  Silently ignore problems in forgeurl, use it if it can be parsed,
+#       ignore it otherwise.
+#   -v  Be verbose and print every spec variable the macro sets.
+#   -i  Print some info about the state of spec variables the macro may use or
+#       set at the end of the processing.
+%forgemeta(az:sviu:) %{lua:
+local      fedora = require "fedora.common"
+local       forge = require "fedora.srpm.forge"
+local     verbose =  rpm.expand("%{-v}") ~= ""
+local informative =  rpm.expand("%{-i}") ~= ""
+local      silent =  rpm.expand("%{-s}") ~= ""
+local  processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+if processall then
+  for _,s in pairs(fedora.getsuffixes("forgeurl")) do
+    forge.forgemeta(s,verbose,informative,silent)
+  end
+else
+  forge.forgemeta(rpm.expand("%{-z*}"),verbose,informative,silent)
+end
+}
+
+# Convenience macro to relay computed arguments to %setup
+# Optional parameters:
+#   -a          process all sources in one go, instead of using separate -z calls
+#   -z <number> read %{?forgesetupargs<number>}
+#   -v          be verbose
+%forgesetup(az:v) %{lua:
+local fedora = require "fedora.common"
+if (rpm.expand("%{-z}") == "") and (rpm.expand("%{-a}") ~= "") then
+  for _,s in pairs(fedora.getsuffixes("forgesetupargs")) do
+    print(rpm.expand("%setup %{!-v:-q} %{?forgesetupargs" .. s                     .. "}\\n"))
+  end
+else
+  print(  rpm.expand("%setup %{!-v:-q} %{?forgesetupargs" .. rpm.expand("%{-z*}") .. "}\\n"))
+end
+}
+
+# Convenience macro to relay computed arguments to %autosetup
+# Parameters relayed to %autosetup: -v -N -S -p
+# Optional parameters:
+#   -z <number> read %{?forgesetupargs<number>}
+%forgeautosetup(z:vNS:p:q) %{lua:
+print(rpm.expand("%autosetup %{-v} %{-N} %{?-S} %{?-p} %{?forgesetupargs" .. rpm.expand("%{-z*}") .. "}\\n"))
+}
+
+# List files matching inclusion globs, excluding files matching exclusion blogs
+# Parameters:
+#  -i "<globs>" include shell globs (also takes all other macro arguments)
+#  -x "<globs>" exclude shell globs
+%listfiles(i:x:) %{expand:
+while IFS= read -r -d $'\\n' finc ; do
+  printf "%s\\n" %{?-x*} \\
+    | xargs -i realpath --relative-base=. '{}' \\
+    | grep "${finc}" >/dev/null || echo "${finc}"
+done <<< $(printf "%s\\n" %{?-i*} %* | xargs -i realpath --relative-base=. '{}' | sort -u)
+}

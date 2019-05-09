@@ -43,11 +43,11 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
-
-%build
 %if %{with riscv64}
 %patch0 -p1
 %endif
+
+%build
 cd user
 find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../user.filelist
 cd ../build

@@ -46,7 +46,7 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %build
 %if %{with riscv64}
-patch -p1 < ../../disable_lto-riscv64.patch
+%patch0 -p1
 %endif
 cd user
 find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../user.filelist

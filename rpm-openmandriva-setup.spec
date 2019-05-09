@@ -1,5 +1,6 @@
 # For transitioning from rpm5
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
+%bcond_with	riscv64
 
 Name:		rpm-openmandriva-setup
 Version:	0.3.6
@@ -42,11 +43,11 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
-%ifarch %{riscv}
-%patch0 -p1
-%endif
 
 %build
+%if %{with riscv64}
+patch -p1 < ../../disable_lto-riscv64.patch
+%endif
 cd user
 find . -type f -o -type l |sed -e 's,^\.,%%{_rpmconfigdir},' >../user.filelist
 cd ../build

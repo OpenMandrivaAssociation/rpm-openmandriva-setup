@@ -1,0 +1,26 @@
+diff --git a/user/openmandriva/macros b/user/openmandriva/macros
+index e67ec9b..468c4ff 100644
+--- a/user/openmandriva/macros
++++ b/user/openmandriva/macros
+@@ -268,7 +268,7 @@ fi
+ 
+ %__libtoolize_configure %{?__libtoolize:(cd $CONFIGURE_TOP; [ ! -f configure.in -a ! -f configure.ac ] || %{__libtoolize} --copy --force)}
+ 
+-%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
++%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?_hardened_flags}
+ 
+ %setup_compile_flags \
+   CC="${CC:-%__cc}" ; export CC ; \
+diff --git a/user/openmandriva/rpmrc b/user/openmandriva/rpmrc
+index cc812b9..65867d4 100644
+--- a/user/openmandriva/rpmrc
++++ b/user/openmandriva/rpmrc
+@@ -4,7 +4,7 @@ include: /usr/lib/rpm/rpmrc
+ # Values for RPM_OPT_FLAGS for various platforms
+ 
+ optflags: aarch64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
+-optflags: riscv64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -march=rv64imafdc -mabi=lp64d %{?!_disable_lto:-flto}
++optflags: riscv64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -march=rv64imafdc -mabi=lp64d
+ 
+ optflags: armv6j %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -march=armv6j -mfpu=vfp -mfloat-abi=hard %{?!_disable_lto:-flto}
+ optflags: armv7l %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 %{?!_disable_lto:-flto}

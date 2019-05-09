@@ -3,12 +3,14 @@
 
 Name:		rpm-openmandriva-setup
 Version:	0.3.6
-Release:	1
+Release:	2
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
 URL:		https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup
 Source0:	https://github.com/OpenMandrivaSoftware/rpm-openmandriva-setup/archive/%{version}/%{name}-%{version}.tar.gz
+# need to disable lto due to mess with autotools
+Patch0:		disable_lto-riscv64.patch
 Requires:	rpm >= 2:4.14.2-0
 Recommends:	systemd-macros
 BuildArch:	noarch
@@ -40,6 +42,9 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
+%ifarch %{riscv}
+%patch0 -p1
+%endif
 
 %build
 cd user

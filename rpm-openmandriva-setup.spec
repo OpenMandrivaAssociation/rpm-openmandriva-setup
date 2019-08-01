@@ -3,7 +3,7 @@
 %bcond_with	riscv64
 
 Name:		rpm-openmandriva-setup
-Version:	0.3.7
+Version:	0.3.7.1
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior

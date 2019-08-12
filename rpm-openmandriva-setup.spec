@@ -43,7 +43,7 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
-%if %{with riscv}
+%if %(uname -m) == riscv64
 %patch0 -p1
 %endif
 

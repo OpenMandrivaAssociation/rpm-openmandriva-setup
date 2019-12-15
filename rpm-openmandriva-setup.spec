@@ -3,7 +3,7 @@
 
 Name:		rpm-openmandriva-setup
 Version:	0.4.0
-Release:	1
+Release:	2
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
@@ -38,6 +38,8 @@ Requires:	binutils
 Requires:	systemd-macros
 Requires:	go-srpm-macros
 Requires:	rpm-helper
+# Ensure this exists in the build environment
+Requires:	/usr/bin/gdb-add-index
 
 %description build
 Macros and scripts for OpenMandriva specific rpmbuild behavior.

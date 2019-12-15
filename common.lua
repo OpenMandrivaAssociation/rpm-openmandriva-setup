@@ -2,7 +2,7 @@
 
 -- Set a spec variable
 -- Echo the result if verbose
-local function explicitset(rpmvar,value,verbose)
+local function explicitset(rpmvar, value, verbose)
   local value = value
   if (value == nil) or (value == "") then
     value = "%{nil}"
@@ -15,7 +15,7 @@ end
 
 -- Unset a spec variable if it is defined
 -- Echo the result if verbose
-local function explicitunset(rpmvar,verbose)
+local function explicitunset(rpmvar, verbose)
   if (rpm.expand("%{" .. rpmvar .. "}") ~= "%{" .. rpmvar .. "}") then
     rpm.define(rpmvar .. " %{nil}")
     if verbose then
@@ -26,7 +26,7 @@ end
 
 -- Set a spec variable, if not already set
 -- Echo the result if verbose
-local function safeset(rpmvar,value,verbose)
+local function safeset(rpmvar, value, verbose)
   if (rpm.expand("%{" .. rpmvar .. "}") == "%{" .. rpmvar .. "}") then
     explicitset(rpmvar,value,verbose)
   end
@@ -34,13 +34,25 @@ end
 
 -- Alias a list of rpm variables to the same variables suffixed with 0 (and vice versa)
 -- Echo the result if verbose
-local function zalias(rpmvars,verbose)
+local function zalias(rpmvars, verbose)
   for _, sfx in ipairs({{"","0"},{"0",""}}) do
     for _, rpmvar in ipairs(rpmvars) do
       local toalias = "%{?" .. rpmvar .. sfx[1] .. "}"
       if (rpm.expand(toalias) ~= "") then
         safeset(rpmvar .. sfx[2], toalias, verbose)
       end
+    end
+  end
+end
+
+-- Takes a list of rpm variable roots and a suffix and alias current<root> to
+-- <root><suffix> if it resolves to something not empty
+local function setcurrent(rpmvars, suffix, verbose)
+  for _, rpmvar in ipairs(rpmvars) do
+    if (rpm.expand("%{?" .. rpmvar .. suffix .. "}") ~= "") then
+      explicitset(  "current" .. rpmvar, "%{" .. rpmvar .. suffix .. "}", verbose)
+    else
+      explicitunset("current" .. rpmvar,                                  verbose)
     end
   end
 end
@@ -101,13 +113,85 @@ local function getbestsuffix(rpmvar, value)
   return best
 end
 
+-- https://github.com/rpm-software-management/rpm/issues/581
+-- Writes the content of a list of rpm variables to a macro spec file.
+-- The target file must contain the corresponding anchors.
+-- For example writevars("myfile", {"foo","bar"}) will replace:
+--   @@FOO@@ with the rpm evaluation of %{foo} and
+--   @@BAR@@ with the rpm evaluation of %{bar}
+-- in myfile
+local function writevars(macrofile, rpmvars)
+  for _, rpmvar in ipairs(rpmvars) do
+    print("sed -i 's\029" .. string.upper("@@" .. rpmvar .. "@@") ..
+                   "\029" .. rpm.expand(  "%{" .. rpmvar .. "}" ) ..
+                   "\029g' " .. macrofile .. "\n")
+  end
+end
+
+-- https://github.com/rpm-software-management/rpm/issues/566
+-- Reformat a text intended to be used used in a package description, removing
+-- rpm macro generation artefacts.
+-- – remove leading and ending empty lines
+-- – trim intermediary empty lines to a single line
+-- – fold on spaces
+-- Should really be a %%{wordwrap:…} verb
+local function wordwrap(text)
+  text = rpm.expand(text .. "\n")
+  text = string.gsub(text, "\t",              "  ")
+  text = string.gsub(text, "\r",              "\n")
+  text = string.gsub(text, " +\n",            "\n")
+  text = string.gsub(text, "\n+\n",           "\n\n")
+  text = string.gsub(text, "^\n",             "")
+  text = string.gsub(text, "\n( *)[-*—][  ]+", "\n%1– ")
+  output = ""
+  for line in string.gmatch(text, "[^\n]*\n") do
+    local pos = 0
+    local advance = ""
+    for word in string.gmatch(line, "%s*[^%s]*\n?") do
+      local wl, bad = utf8.len(word)
+      if not wl then
+        print("%{warn: Invalid UTF-8 sequence detected in:\n" ..
+               word .. "\nIt may produce unexpected results.\n}")
+        wl = bad
+      end
+      if (pos == 0) then
+        advance, n = string.gsub(word, "^(%s*– ).*", "%1")
+        if (n == 0) then
+          advance = string.gsub(word, "^(%s*).*", "%1")
+        end
+        advance = string.gsub(advance, "– ", "  ")
+        pos = pos + wl
+      elseif  (pos + wl  < 81) or
+             ((pos + wl == 81) and string.match(word, "\n$")) then
+        pos = pos + wl
+      else
+        word = advance .. string.gsub(word, "^%s*", "")
+        output = output .. "\n"
+        pos = utf8.len(word)
+      end
+      output = output .. word
+      if pos > 80 then
+        pos = 0
+        if not string.match(word, "\n$") then
+          output = output .. "\n"
+        end
+      end
+    end
+  end
+  output = string.gsub(output, "\n*$", "\n")
+  return output
+end
+
 return {
   explicitset   = explicitset,
   explicitunset = explicitunset,
   safeset       = safeset,
   zalias        = zalias,
+  setcurrent    = setcurrent,
   echovars      = echovars,
   getsuffixed   = getsuffixed,
   getsuffixes   = getsuffixes,
   getbestsuffix = getbestsuffix,
+  writevars     = writevars,
+  wordwrap      = wordwrap,
 }

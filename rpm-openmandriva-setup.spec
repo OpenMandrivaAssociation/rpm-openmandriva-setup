@@ -1,9 +1,8 @@
 # For transitioning from rpm5
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
-%bcond_with	riscv64
 
 Name:		rpm-openmandriva-setup
-Version:	0.3.7.1
+Version:	0.4.0
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
@@ -36,14 +35,16 @@ Requires:	rpmlint
 Requires:	rpmlint-openmandriva-policy
 Requires:	spec-helper >= 0.31.12
 Requires:	binutils
-Recommends:	systemd-macros
+Requires:	systemd-macros
+Requires:	go-srpm-macros
+Requires:	rpm-helper
 
 %description build
 Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
-%if %(uname -m) == riscv64
+%ifarch riscv64
 %patch0 -p1
 %endif
 

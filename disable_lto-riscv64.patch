@@ -1,16 +1,16 @@
 diff --git a/user/openmandriva/macros b/user/openmandriva/macros
-index 35c82c6..2be4ada 100644
+index e013588..60f0d42 100644
 --- a/user/openmandriva/macros
 +++ b/user/openmandriva/macros
-@@ -268,7 +268,7 @@ fi
+@@ -107,7 +107,7 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
+ # the corresponding variable names.
+ %build_fflags %{optflags} -I%{_fmoddir}
  
- %__libtoolize_configure %{?__libtoolize:(cd $CONFIGURE_TOP; [ ! -f configure.in -a ! -f configure.ac ] || %{__libtoolize} --copy --force)}
+-%build_ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
++%build_ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?_hardened_flags}
  
--%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
-+%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?_hardened_flags}
- %__global_ldflags %ldflags
- 
- %setup_compile_flags \
+ # Deprecated names.  For backwards compatibility only.
+ %ldflags %build_ldflags
 diff --git a/user/openmandriva/rpmrc b/user/openmandriva/rpmrc
 index b89e148..71ce873 100644
 --- a/user/openmandriva/rpmrc

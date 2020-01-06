@@ -3,7 +3,7 @@
 
 Name:		rpm-openmandriva-setup
 Version:	0.4.2
-Release:	1
+Release:	2
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
@@ -36,8 +36,11 @@ Requires:	rpmlint-openmandriva-policy
 Requires:	spec-helper >= 0.31.12
 Requires:	binutils
 Requires:	systemd-macros
-Requires:	go-srpm-macros
 Requires:	rpm-helper
+# go and rust srpm macros are needed by mock/dnf builddep to
+# prevent unexpanded macros
+Requires:	go-srpm-macros
+Requires:	rust-srpm-macros
 # Ensure this exists in the build environment
 Requires:	/usr/bin/gdb-add-index
 

@@ -2,8 +2,8 @@
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
 
 Name:		rpm-openmandriva-setup
-Version:	0.4.2
-Release:	2
+Version:	0.4.3
+Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
 License:	MIT
@@ -49,9 +49,14 @@ Macros and scripts for OpenMandriva specific rpmbuild behavior.
 
 %prep
 %setup -q
-%ifarch riscv64
+# FIXME
+# Can't use ifarch here because this is a noarch package...
+# Of course that means it shouldn't differ between arches, but
+# this is ok as a temporary workaround...
+# RISC-V LTO should be fixed soon enough
+if uname -m |grep -q riscv; then
 %patch0 -p1
-%endif
+fi
 
 %build
 cd user

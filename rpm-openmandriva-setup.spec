@@ -2,7 +2,7 @@
 %{!?_rpmconfigdir: %define _rpmconfigdir /usr/lib/rpm}
 
 Name:		rpm-openmandriva-setup
-Version:	0.4.5.3
+Version:	0.4.5.4
 Release:	1
 Group:		System/Configuration/Packaging
 Summary:	Macros and scripts for OpenMandriva specific rpm behavior
